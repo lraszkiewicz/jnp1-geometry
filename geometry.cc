@@ -1,10 +1,7 @@
 // Łukasz Raszkiewicz, Konrad Majewski
 
 #include <cassert>
-
 #include "geometry.h"
-
-using std::pair;
 
 // Position methods implementation
 Position::Position(int x, int y)
@@ -79,17 +76,20 @@ Rectangle Vector::operator+(const Rectangle& other) const {
 }
 
 // Rectangle methods implementation
-Rectangle::Rectangle(unsigned int width, unsigned int height, Position pos)
-    : width_(width), height_(height), bottom_left(pos) {}
+Rectangle::Rectangle(int width, int height, Position pos)
+    : width_(width), height_(height), bottom_left(pos) {
+    assert(width > 0);
+    assert(height > 0);
+}
 
-Rectangle::Rectangle(unsigned int width, unsigned int height)
+Rectangle::Rectangle(int width, int height)
     : Rectangle(width, height, Position::origin()) {}
 
-unsigned int Rectangle::width() const {
+int Rectangle::width() const {
     return width_;
 }
 
-unsigned int Rectangle::height() const {
+int Rectangle::height() const {
     return height_;
 }
 
@@ -101,13 +101,12 @@ Rectangle Rectangle::reflection() const {
     return Rectangle(height_, width_, bottom_left.reflection());
 }
 
-unsigned int Rectangle::area() const {
+int Rectangle::area() const {
     return width_ * height_;
 }
 
-pair<Rectangle, Rectangle> Rectangle::split_horizontally(int place) const {
-    // TODO: warning: comparison between signed and unsigned integer expressions
-    assert(bottom_left.y() <= place && place <= bottom_left.y() + height_);
+std::pair<Rectangle, Rectangle> Rectangle::split_horizontally(int place) const {
+    assert(bottom_left.y() < place && place < bottom_left.y() + height_);
     return {
         Rectangle(width_, place - bottom_left.y(), bottom_left),
         Rectangle(width_, bottom_left.y() + height_ - place,
@@ -115,9 +114,8 @@ pair<Rectangle, Rectangle> Rectangle::split_horizontally(int place) const {
     };
 }
 
-pair<Rectangle, Rectangle> Rectangle::split_vertically(int place) const {
-    // TODO: warning: comparison between signed and unsigned integer expressions
-    assert(bottom_left.x() <= place && place <= bottom_left.x() + width_);
+std::pair<Rectangle, Rectangle> Rectangle::split_vertically(int place) const {
+    assert(bottom_left.x() < place && place < bottom_left.x() + width_);
     return {
         Rectangle(place - bottom_left.x(), height_, bottom_left),
         Rectangle(bottom_left.x() + width_ - place, height_,
@@ -139,3 +137,17 @@ Rectangle& Rectangle::operator+=(const Vector& other) {
 Rectangle Rectangle::operator+(const Vector& other) const {
     return Rectangle(*this) += other;
 }
+
+// Additional functions implementation
+Rectangle merge_horizontally(const Rectangle& rect1, const Rectangle& rect2) {
+    assert(rect1.width() == rect2.width());
+    assert(rect1.pos() + Vector(0, rect1.height()) == rect2.pos());
+    return Rectangle(rect1.width(), rect1.height() + rect2.height(), rect1.pos());
+}
+
+Rectangle merge_vertically(const Rectangle& rect1, const Rectangle& rect2) {
+    assert(rect1.height() == rect2.height());
+    assert(rect1.pos() + Vector(rect1.width(), 0) == rect2.pos());
+    return Rectangle(rect1.width() + rect2.width(), rect1.height(), rect1.pos());
+}
+

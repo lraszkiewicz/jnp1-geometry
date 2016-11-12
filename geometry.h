@@ -43,13 +43,13 @@ private:
 
 class Rectangle {
 public:
-    Rectangle(unsigned int width, unsigned int height, Position pos);
-    Rectangle(unsigned int width, unsigned int height);
-    unsigned int width() const;
-    unsigned int height() const;
+    Rectangle(int width, int height, Position pos);
+    Rectangle(int width, int height);
+    int width() const;
+    int height() const;
     Position pos() const;
     Rectangle reflection() const;
-    unsigned int area() const;
+    int area() const;
     std::pair<Rectangle, Rectangle> split_horizontally(int place) const;
     std::pair<Rectangle, Rectangle> split_vertically(int place) const;
     bool operator==(const Rectangle& other) const;
@@ -57,9 +57,12 @@ public:
     Rectangle operator+(const Vector& other) const;
 
 private:
-    unsigned int width_;
-    unsigned int height_;
+    int width_;
+    int height_;
     Position bottom_left;
 };
+
+Rectangle merge_horizontally(const Rectangle& rect1, const Rectangle& rect2);
+Rectangle merge_vertically(const Rectangle& rect1, const Rectangle& rect2);
 
 #endif  // GEOMETRY_H_
