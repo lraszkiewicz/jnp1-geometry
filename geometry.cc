@@ -151,3 +151,45 @@ Rectangle merge_vertically(const Rectangle& rect1, const Rectangle& rect2) {
     return Rectangle(rect1.width() + rect2.width(), rect1.height(), rect1.pos());
 }
 
+// Rectangles methods implementation
+Rectangles::Rectangles() {};
+
+Rectangles::Rectangles(std::initializer_list<Rectangle> recs)
+    : rectangle_list(recs) {};
+
+size_t Rectangles::size() const {
+    return rectangle_list.size();
+}
+
+void Rectangles::split_horizontally(size_t idx, int place) {
+    assert(idx < rectangle_list.size());
+    auto it = rectangle_list.begin() + idx;
+    auto new_recs = (*it).split_horizontally(place);
+    it = rectangle_list.erase(it);
+    rectangle_list.insert(it, new_recs.first);
+    rectangle_list.insert(it, new_recs.second);
+}
+
+void Rectangles::split_vertically(size_t idx, int place) {
+    assert(idx < rectangle_list.size());
+    auto it = rectangle_list.begin() + idx;
+    auto new_recs = (*it).split_vertically(place);
+    it = rectangle_list.erase(it);
+    rectangle_list.insert(it, new_recs.first);
+    rectangle_list.insert(it, new_recs.second);
+}
+
+Rectangle& Rectangles::operator[](size_t i) {
+    assert(i < rectangle_list.size());
+    return rectangle_list[i];
+}
+
+bool Rectangles::operator==(const Rectangles& other) const {
+    return rectangle_list == other.rectangle_list;
+}
+
+Rectangles& Rectangles::operator+=(const Vector& other) {
+    for (Rectangle rec : rectangle_list)
+        rec += other;
+    return *this;
+}

@@ -3,11 +3,15 @@
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
+#include <initializer_list>
+#include <cstddef>
 #include <utility>
+#include <vector>
 
 class Position;
 class Vector;
 class Rectangle;
+class Rectangles;
 
 class Position {
 public:
@@ -64,5 +68,20 @@ private:
 
 Rectangle merge_horizontally(const Rectangle& rect1, const Rectangle& rect2);
 Rectangle merge_vertically(const Rectangle& rect1, const Rectangle& rect2);
+
+class Rectangles {
+public:
+    Rectangles();
+    Rectangles(std::initializer_list<Rectangle> recs);
+    size_t size() const;
+    void split_horizontally(size_t idx, int place);
+    void split_vertically(size_t idx, int place);
+    Rectangle& operator[](size_t i);
+    bool operator==(const Rectangles& other) const;
+    Rectangles& operator+=(const Vector& other);
+
+private:
+    std::vector<Rectangle> rectangle_list;
+};
 
 #endif  // GEOMETRY_H_
