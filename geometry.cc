@@ -1,9 +1,14 @@
 // Łukasz Raszkiewicz, Konrad Majewski
 
 #include <cassert>
+
 #include "geometry.h"
 
-// Position methods implementation
+using std::initializer_list;
+using std::move;
+using std::pair;
+
+// implementation of methods from class Position
 Position::Position(int32_t x, int32_t y)
     : x_(x), y_(y) {}
 
@@ -34,9 +39,10 @@ Position& Position::operator+=(const Vector& vec) {
     return *this;
 }
 
-// Vector methods implementation
+
+// implementation of methods from class Vector
 Vector::Vector(int32_t x, int32_t y)
-    : point(Position(x,y)) {}
+    : point(Position(x, y)) {}
 
 int32_t Vector::x() const {
     return point.x();
@@ -59,9 +65,11 @@ Vector& Vector::operator+=(const Vector& vec) {
     return *this;
 }
 
-// Rectangle methods implementation
+
+// implementation of methods from class Rectangle
 Rectangle::Rectangle(int32_t width, int32_t height, Position pos)
     : width_(width), height_(height), bottom_left(pos) {
+
     assert(width > 0);
     assert(height > 0);
 }
@@ -89,7 +97,7 @@ int32_t Rectangle::area() const {
     return width_ * height_;
 }
 
-std::pair<Rectangle, Rectangle> Rectangle::split_horizontally(int32_t place) const {
+pair<Rectangle, Rectangle> Rectangle::split_horizontally(int32_t place) const {
     assert(bottom_left.y() < place && place < bottom_left.y() + height_);
     return {
         Rectangle(width_, place - bottom_left.y(), bottom_left),
@@ -98,11 +106,11 @@ std::pair<Rectangle, Rectangle> Rectangle::split_horizontally(int32_t place) con
     };
 }
 
-std::pair<Rectangle, Rectangle> Rectangle::split_vertically(int32_t place) const {
+pair<Rectangle, Rectangle> Rectangle::split_vertically(int32_t place) const {
     auto rect_pair = reflection().split_horizontally(place);
     return {
-            rect_pair.first.reflection(),
-            rect_pair.second.reflection()
+        rect_pair.first.reflection(),
+        rect_pair.second.reflection()
     };
 }
 
@@ -117,11 +125,12 @@ Rectangle& Rectangle::operator+=(const Vector& vec) {
     return *this;
 }
 
-// Rectangles methods implementation
-Rectangles::Rectangles() {};
 
-Rectangles::Rectangles(std::initializer_list<Rectangle> recs)
-    : rectangle_list(recs) {};
+// implementation of methods from class Rectangles
+Rectangles::Rectangles() {}
+
+Rectangles::Rectangles(initializer_list<Rectangle> recs)
+    : rectangle_list(recs) {}
 
 size_t Rectangles::size() const {
     return rectangle_list.size();
@@ -130,20 +139,26 @@ size_t Rectangles::size() const {
 void Rectangles::split_horizontally(size_t idx, int32_t place) {
     assert(idx < rectangle_list.size());
     auto it = rectangle_list.begin() + idx;
-    auto new_recs = (*it).split_horizontally(place);
-    it = rectangle_list.erase(it);
-    rectangle_list.insert(it, new_recs.first);
-    rectangle_list.insert(it, new_recs.second);
+    auto new_recs = it->split_horizontally(place);
+    *it = new_recs.first;
+    rectangle_list.insert(it + 1, new_recs.second);
 }
 
 void Rectangles::split_vertically(size_t idx, int32_t place) {
     assert(idx < rectangle_list.size());
     auto it = rectangle_list.begin() + idx;
-    auto new_recs = (*it).split_vertically(place);
-    it = rectangle_list.erase(it);
-    rectangle_list.insert(it, new_recs.first);
-    rectangle_list.insert(it, new_recs.second);
+    auto new_recs = it->split_vertically(place);
+    *it = new_recs.first;
+    rectangle_list.insert(it + 1, new_recs.second);
 }
+
+// void Rectangles::split_vertically(size_t idx, int32_t place) {
+//     assert(idx < rectangle_list.size());
+//     rectangle_list[idx] = rectangle_list[idx].reflection();
+//     split_horizontally(idx, place);
+//     rectangle_list[idx] = rectangle_list[idx].reflection();
+//     rectangle_list[idx + 1] = rectangle_list[idx + 1].reflection();
+// }
 
 Rectangle& Rectangles::operator[](size_t i) {
     assert(i < rectangle_list.size());
@@ -160,13 +175,14 @@ Rectangles& Rectangles::operator+=(const Vector& vec) {
     return *this;
 }
 
-// Additional operators implementation
+
+// implementation of + operators
 const Position operator+(const Position& pos, const Vector& vec) {
     return Position(pos) += vec;
 }
 
 const Position operator+(Position&& pos, const Vector& vec) {
-    return std::move(pos) += vec;
+    return move(pos) += vec;
 }
 
 const Position operator+(const Vector& vec, const Position& pos) {
@@ -182,7 +198,7 @@ const Vector operator+(const Vector& vec1, const Vector& vec2) {
 }
 
 const Vector operator+(Vector&& vec1, const Vector& vec2) {
-    return std::move(vec1) += vec2;
+    return move(vec1) += vec2;
 }
 
 const Vector operator+(const Vector& vec1, Vector&& vec2) {
@@ -190,7 +206,7 @@ const Vector operator+(const Vector& vec1, Vector&& vec2) {
 }
 
 const Vector operator+(Vector&& vec1, Vector&& vec2) {
-    return std::move(vec1) += vec2;
+    return move(vec1) += vec2;
 }
 
 const Rectangle operator+(const Rectangle& rec, const Vector& vec) {
@@ -198,7 +214,7 @@ const Rectangle operator+(const Rectangle& rec, const Vector& vec) {
 }
 
 const Rectangle operator+(Rectangle&& rec, const Vector& vec) {
-    return std::move(rec) += vec;
+    return move(rec) += vec;
 }
 
 const Rectangle operator+(const Vector& vec, const Rectangle& rec) {
@@ -214,7 +230,7 @@ const Rectangles operator+(const Rectangles& recs, const Vector& vec) {
 }
 
 const Rectangles operator+(Rectangles&& recs, const Vector& vec) {
-    return std::move(recs) += vec;
+    return move(recs) += vec;
 }
 
 const Rectangles operator+(const Vector& vec, const Rectangles& recs) {
@@ -225,13 +241,17 @@ const Rectangles operator+(const Vector& vec, Rectangles&& recs) {
     return recs + vec;
 }
 
-// Additional functions implementation
+
+// implementation of merge_* functions
 Rectangle merge_horizontally(const Rectangle& rect1, const Rectangle& rect2) {
     assert(rect1.width() == rect2.width());
     assert(rect1.pos() + Vector(0, rect1.height()) == rect2.pos());
-    return Rectangle(rect1.width(), rect1.height() + rect2.height(), rect1.pos());
+    return Rectangle(
+        rect1.width(), rect1.height() + rect2.height(), rect1.pos());
 }
 
 Rectangle merge_vertically(const Rectangle& rect1, const Rectangle& rect2) {
-    return merge_horizontally(rect1.reflection(), rect2.reflection()).reflection();
+    return merge_horizontally(
+        rect1.reflection(), rect2.reflection()
+    ).reflection();
 }

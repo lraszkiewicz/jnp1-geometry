@@ -3,9 +3,9 @@
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 
-#include <initializer_list>
 #include <cstddef>
 #include <cstdint>
+#include <initializer_list>
 #include <utility>
 #include <vector>
 
