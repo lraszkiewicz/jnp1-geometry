@@ -4,14 +4,14 @@
 #include "geometry.h"
 
 // Position methods implementation
-Position::Position(int x, int y)
+Position::Position(int32_t x, int32_t y)
     : x_(x), y_(y) {}
 
-int Position::x() const {
+int32_t Position::x() const {
     return x_;
 }
 
-int Position::y() const {
+int32_t Position::y() const {
     return y_;
 }
 
@@ -28,25 +28,21 @@ bool Position::operator==(const Position& other) const {
     return x_ == other.x_ && y_ == other.y_;
 }
 
-Position& Position::operator+=(const Vector& other) {
-    x_ += other.x();
-    y_ += other.y();
+Position& Position::operator+=(const Vector& vec) {
+    x_ += vec.x();
+    y_ += vec.y();
     return *this;
 }
 
-Position Position::operator+(const Vector& other) const {
-    return Position(*this) += other;
-}
-
 // Vector methods implementation
-Vector::Vector(int x, int y)
+Vector::Vector(int32_t x, int32_t y)
     : point(Position(x,y)) {}
 
-int Vector::x() const {
+int32_t Vector::x() const {
     return point.x();
 }
 
-int Vector::y() const {
+int32_t Vector::y() const {
     return point.y();
 }
 
@@ -58,38 +54,26 @@ bool Vector::operator==(const Vector& other) const {
     return point == other.point;
 }
 
-Vector& Vector::operator+=(const Vector& other) {
-    point += other;
+Vector& Vector::operator+=(const Vector& vec) {
+    point += vec;
     return *this;
 }
 
-Position Vector::operator+(const Position& other) const {
-    return other + *this;
-}
-
-Vector Vector::operator+(const Vector& other) const {
-    return Vector(*this) += other;
-}
-
-Rectangle Vector::operator+(const Rectangle& other) const {
-    return other + *this;
-}
-
 // Rectangle methods implementation
-Rectangle::Rectangle(int width, int height, Position pos)
+Rectangle::Rectangle(int32_t width, int32_t height, Position pos)
     : width_(width), height_(height), bottom_left(pos) {
     assert(width > 0);
     assert(height > 0);
 }
 
-Rectangle::Rectangle(int width, int height)
+Rectangle::Rectangle(int32_t width, int32_t height)
     : Rectangle(width, height, Position::origin()) {}
 
-int Rectangle::width() const {
+int32_t Rectangle::width() const {
     return width_;
 }
 
-int Rectangle::height() const {
+int32_t Rectangle::height() const {
     return height_;
 }
 
@@ -101,11 +85,11 @@ Rectangle Rectangle::reflection() const {
     return Rectangle(height_, width_, bottom_left.reflection());
 }
 
-int Rectangle::area() const {
+int32_t Rectangle::area() const {
     return width_ * height_;
 }
 
-std::pair<Rectangle, Rectangle> Rectangle::split_horizontally(int place) const {
+std::pair<Rectangle, Rectangle> Rectangle::split_horizontally(int32_t place) const {
     assert(bottom_left.y() < place && place < bottom_left.y() + height_);
     return {
         Rectangle(width_, place - bottom_left.y(), bottom_left),
@@ -114,12 +98,11 @@ std::pair<Rectangle, Rectangle> Rectangle::split_horizontally(int place) const {
     };
 }
 
-std::pair<Rectangle, Rectangle> Rectangle::split_vertically(int place) const {
-    assert(bottom_left.x() < place && place < bottom_left.x() + width_);
+std::pair<Rectangle, Rectangle> Rectangle::split_vertically(int32_t place) const {
+    auto rect_pair = reflection().split_horizontally(place);
     return {
-        Rectangle(place - bottom_left.x(), height_, bottom_left),
-        Rectangle(bottom_left.x() + width_ - place, height_,
-            bottom_left + Vector(place - bottom_left.x(), 0))
+            rect_pair.first.reflection(),
+            rect_pair.second.reflection()
     };
 }
 
@@ -129,26 +112,9 @@ bool Rectangle::operator==(const Rectangle& other) const {
         && bottom_left == other.bottom_left;
 }
 
-Rectangle& Rectangle::operator+=(const Vector& other) {
-    bottom_left += other;
+Rectangle& Rectangle::operator+=(const Vector& vec) {
+    bottom_left += vec;
     return *this;
-}
-
-Rectangle Rectangle::operator+(const Vector& other) const {
-    return Rectangle(*this) += other;
-}
-
-// Additional functions implementation
-Rectangle merge_horizontally(const Rectangle& rect1, const Rectangle& rect2) {
-    assert(rect1.width() == rect2.width());
-    assert(rect1.pos() + Vector(0, rect1.height()) == rect2.pos());
-    return Rectangle(rect1.width(), rect1.height() + rect2.height(), rect1.pos());
-}
-
-Rectangle merge_vertically(const Rectangle& rect1, const Rectangle& rect2) {
-    assert(rect1.height() == rect2.height());
-    assert(rect1.pos() + Vector(rect1.width(), 0) == rect2.pos());
-    return Rectangle(rect1.width() + rect2.width(), rect1.height(), rect1.pos());
 }
 
 // Rectangles methods implementation
@@ -161,7 +127,7 @@ size_t Rectangles::size() const {
     return rectangle_list.size();
 }
 
-void Rectangles::split_horizontally(size_t idx, int place) {
+void Rectangles::split_horizontally(size_t idx, int32_t place) {
     assert(idx < rectangle_list.size());
     auto it = rectangle_list.begin() + idx;
     auto new_recs = (*it).split_horizontally(place);
@@ -170,7 +136,7 @@ void Rectangles::split_horizontally(size_t idx, int place) {
     rectangle_list.insert(it, new_recs.second);
 }
 
-void Rectangles::split_vertically(size_t idx, int place) {
+void Rectangles::split_vertically(size_t idx, int32_t place) {
     assert(idx < rectangle_list.size());
     auto it = rectangle_list.begin() + idx;
     auto new_recs = (*it).split_vertically(place);
@@ -188,8 +154,36 @@ bool Rectangles::operator==(const Rectangles& other) const {
     return rectangle_list == other.rectangle_list;
 }
 
-Rectangles& Rectangles::operator+=(const Vector& other) {
-    for (Rectangle rec : rectangle_list)
-        rec += other;
+Rectangles& Rectangles::operator+=(const Vector& vec) {
+    for (Rectangle& rec : rectangle_list)
+        rec += vec;
     return *this;
+}
+
+// Additional operators implementation
+const Position operator+(Position pos, const Vector& vec) {
+    return pos += vec;
+}
+
+const Position operator+(Position&& pos, const Vector& vec) {
+    return std::move(pos) += vec;
+}
+
+const Position operator+(const Vector& vec, Position pos) {
+    return pos + vec;
+}
+
+const Position operator+(const Vector& vec, Position&& pos) {
+    return pos + vec;
+}
+
+// Additional functions implementation
+Rectangle merge_horizontally(const Rectangle& rect1, const Rectangle& rect2) {
+    assert(rect1.width() == rect2.width());
+    assert(rect1.pos() + Vector(0, rect1.height()) == rect2.pos());
+    return Rectangle(rect1.width(), rect1.height() + rect2.height(), rect1.pos());
+}
+
+Rectangle merge_vertically(const Rectangle& rect1, const Rectangle& rect2) {
+    return merge_horizontally(rect1.reflection(), rect2.reflection()).reflection();
 }
