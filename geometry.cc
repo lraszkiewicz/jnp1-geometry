@@ -161,20 +161,68 @@ Rectangles& Rectangles::operator+=(const Vector& vec) {
 }
 
 // Additional operators implementation
-const Position operator+(Position pos, const Vector& vec) {
-    return pos += vec;
+const Position operator+(const Position& pos, const Vector& vec) {
+    return Position(pos) += vec;
 }
 
 const Position operator+(Position&& pos, const Vector& vec) {
     return std::move(pos) += vec;
 }
 
-const Position operator+(const Vector& vec, Position pos) {
+const Position operator+(const Vector& vec, const Position& pos) {
     return pos + vec;
 }
 
 const Position operator+(const Vector& vec, Position&& pos) {
     return pos + vec;
+}
+
+const Vector operator+(const Vector& vec1, const Vector& vec2) {
+    return Vector(vec1) += vec2;
+}
+
+const Vector operator+(Vector&& vec1, const Vector& vec2) {
+    return std::move(vec1) += vec2;
+}
+
+const Vector operator+(const Vector& vec1, Vector&& vec2) {
+    return vec2 + vec1;
+}
+
+const Vector operator+(Vector&& vec1, Vector&& vec2) {
+    return std::move(vec1) += vec2;
+}
+
+const Rectangle operator+(const Rectangle& rec, const Vector& vec) {
+    return Rectangle(rec) += vec;
+}
+
+const Rectangle operator+(Rectangle&& rec, const Vector& vec) {
+    return std::move(rec) += vec;
+}
+
+const Rectangle operator+(const Vector& vec, const Rectangle& rec) {
+    return rec + vec;
+}
+
+const Rectangle operator+(const Vector& vec, Rectangle&& rec) {
+    return rec + vec;
+}
+
+const Rectangles operator+(const Rectangles& recs, const Vector& vec) {
+    return Rectangles(recs) += vec;
+}
+
+const Rectangles operator+(Rectangles&& recs, const Vector& vec) {
+    return std::move(recs) += vec;
+}
+
+const Rectangles operator+(const Vector& vec, const Rectangles& recs) {
+    return recs + vec;
+}
+
+const Rectangles operator+(const Vector& vec, Rectangles&& recs) {
+    return recs + vec;
 }
 
 // Additional functions implementation

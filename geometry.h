@@ -76,24 +76,25 @@ private:
     std::vector<Rectangle> rectangle_list;
 };
 
-const Position operator+(Position pos, const Vector& vec);
+const Position operator+(const Position& pos, const Vector& vec);
 const Position operator+(Position&& pos, const Vector& vec);
-const Position operator+(const Vector& vec, Position pos);
+const Position operator+(const Vector& vec, const Position& pos);
 const Position operator+(const Vector& vec, Position&& pos);
 
-const Vector operator+(Vector vec1, const Vector& vec2);
+const Vector operator+(const Vector& vec1, const Vector& vec2);
 const Vector operator+(Vector&& vec1, const Vector& vec2);
 const Vector operator+(const Vector& vec1, Vector&& vec2);
+const Vector operator+(Vector&& vec1, Vector&& vec2);
 
-const Rectangle operator+(Rectangle pos, const Vector& vec);
-const Rectangle operator+(Rectangle&& pos, const Vector& vec);
-const Rectangle operator+(const Vector& vec, Rectangle pos);
-const Rectangle operator+(const Vector& vec, Rectangle&& pos);
+const Rectangle operator+(const Rectangle& rec, const Vector& vec);
+const Rectangle operator+(Rectangle&& rec, const Vector& vec);
+const Rectangle operator+(const Vector& vec, const Rectangle& rec);
+const Rectangle operator+(const Vector& vec, Rectangle&& rec);
 
-const Rectangles operator+(Rectangles pos, const Vector& vec);
-const Rectangles operator+(Rectangles&& pos, const Vector& vec);
-const Rectangles operator+(const Vector& vec, Rectangles pos);
-const Rectangles operator+(const Vector& vec, Rectangles&& pos);
+const Rectangles operator+(const Rectangles& recs, const Vector& vec);
+const Rectangles operator+(Rectangles&& recs, const Vector& vec);
+const Rectangles operator+(const Vector& vec, const Rectangles& recs);
+const Rectangles operator+(const Vector& vec, Rectangles&& recs);
 
 Rectangle merge_horizontally(const Rectangle& rect1, const Rectangle& rect2);
 Rectangle merge_vertically(const Rectangle& rect1, const Rectangle& rect2);
