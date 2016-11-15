@@ -67,7 +67,7 @@ Vector& Vector::operator+=(const Vector& vec) {
 
 
 // implementation of methods from class Rectangle
-Rectangle::Rectangle(int32_t width, int32_t height, Position pos)
+Rectangle::Rectangle(int32_t width, int32_t height, const Position& pos)
     : width_(width), height_(height), bottom_left(pos) {
 
     assert(width > 0);
