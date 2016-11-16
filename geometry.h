@@ -43,7 +43,7 @@ private:
 
 class Rectangle {
 public:
-    Rectangle(int32_t width, int32_t height, Position pos);
+    Rectangle(int32_t width, int32_t height, const Position& pos);
     Rectangle(int32_t width, int32_t height);
     int32_t width() const;
     int32_t height() const;
