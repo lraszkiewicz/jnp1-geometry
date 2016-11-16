@@ -74,6 +74,7 @@ public:
 
 private:
     std::vector<Rectangle> rectangle_list;
+    void split(size_t idx, int32_t place, bool horizontally);
 };
 
 const Position operator+(const Position& pos, const Vector& vec);

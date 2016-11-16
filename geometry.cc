@@ -136,29 +136,23 @@ size_t Rectangles::size() const {
     return rectangle_list.size();
 }
 
-void Rectangles::split_horizontally(size_t idx, int32_t place) {
+void Rectangles::split(size_t idx, int32_t place, bool horizontally) {
     assert(idx < rectangle_list.size());
     auto it = rectangle_list.begin() + idx;
-    auto new_recs = it->split_horizontally(place);
+    auto new_recs = horizontally
+        ? it->split_horizontally(place)
+        : it->split_vertically(place);
     *it = new_recs.first;
     rectangle_list.insert(it + 1, new_recs.second);
+}
+
+void Rectangles::split_horizontally(size_t idx, int32_t place) {
+    split(idx, place, true);
 }
 
 void Rectangles::split_vertically(size_t idx, int32_t place) {
-    assert(idx < rectangle_list.size());
-    auto it = rectangle_list.begin() + idx;
-    auto new_recs = it->split_vertically(place);
-    *it = new_recs.first;
-    rectangle_list.insert(it + 1, new_recs.second);
+    split(idx, place, false);
 }
-
-// void Rectangles::split_vertically(size_t idx, int32_t place) {
-//     assert(idx < rectangle_list.size());
-//     rectangle_list[idx] = rectangle_list[idx].reflection();
-//     split_horizontally(idx, place);
-//     rectangle_list[idx] = rectangle_list[idx].reflection();
-//     rectangle_list[idx + 1] = rectangle_list[idx + 1].reflection();
-// }
 
 Rectangle& Rectangles::operator[](size_t i) {
     assert(i < rectangle_list.size());
@@ -252,6 +246,5 @@ Rectangle merge_horizontally(const Rectangle& rect1, const Rectangle& rect2) {
 
 Rectangle merge_vertically(const Rectangle& rect1, const Rectangle& rect2) {
     return merge_horizontally(
-        rect1.reflection(), rect2.reflection()
-    ).reflection();
+        rect1.reflection(), rect2.reflection()).reflection();
 }
