@@ -98,11 +98,10 @@ int32_t Rectangle::area() const {
 }
 
 pair<Rectangle, Rectangle> Rectangle::split_horizontally(int32_t place) const {
-    assert(bottom_left.y() < place && place < bottom_left.y() + height_);
+    assert(0 < place && place < height_);
     return {
-        Rectangle(width_, place - bottom_left.y(), bottom_left),
-        Rectangle(width_, bottom_left.y() + height_ - place,
-            bottom_left + Vector(0, place - bottom_left.y()))
+        Rectangle(width_, place, bottom_left),
+        Rectangle(width_, height_ - place, bottom_left + Vector(0, place))
     };
 }
 
