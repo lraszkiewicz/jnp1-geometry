@@ -24,7 +24,7 @@ Position Position::reflection() const {
     return Position(y_, x_);
 }
 
-const Position Position::origin() {
+const Position& Position::origin() {
     static const Position origin_field = Position(0, 0);
     return origin_field;
 }
@@ -154,6 +154,11 @@ void Rectangles::split_vertically(size_t idx, int32_t place) {
 }
 
 Rectangle& Rectangles::operator[](size_t i) {
+    assert(i < rectangle_list.size());
+    return rectangle_list[i];
+}
+
+const Rectangle& Rectangles::operator[](size_t i) const {
     assert(i < rectangle_list.size());
     return rectangle_list[i];
 }

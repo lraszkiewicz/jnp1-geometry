@@ -20,7 +20,7 @@ public:
     int32_t x() const;
     int32_t y() const;
     Position reflection() const;
-    static const Position origin();
+    static const Position& origin();
     bool operator==(const Position& other) const;
     Position& operator+=(const Vector& vec);
 
@@ -69,6 +69,7 @@ public:
     void split_horizontally(size_t idx, int32_t place);
     void split_vertically(size_t idx, int32_t place);
     Rectangle& operator[](size_t i);
+    const Rectangle& operator[](size_t i) const;
     bool operator==(const Rectangles& other) const;
     Rectangles& operator+=(const Vector& vec);
 
